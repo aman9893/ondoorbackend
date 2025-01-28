@@ -101,7 +101,230 @@ module.exports.controller = (app, io, socket_list) => {
         })
     })
 
+
+    // ----------------------------------------- category_add  ----------------------------------------------------------------
+    app.post("/api/admin/product_category_add", (req, res) => {
+        //aman
+        var reqObj = req.body;
+        checkAccessToken(req.headers, res, (uObj) => {
+            helper.CheckParameterValid(res, reqObj, ["cat_name", "color"], () => {
+                db.query("INSERT INTO `category_detail`( `cat_name`, `image`, `color`, `created_date`, `modify_date`) VALUES  (?,?,?, NOW(), NOW())", [
+                    reqObj.cat_name, reqObj.image, reqObj.color
+                ], (err, result) => {
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return;
+                    }
+
+                    if (result) {
+                        res.json({
+                            "status": "1", "payload": {
+                                "cat_id": result.insertId,
+                                "cat_name": reqObj.cat_name[0],
+                                "color": reqObj.color[0],
+                                "image": '',
+                            }, "message": msg_category_added
+                        });
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
+                })
+            })
+        })
+    })
+// ----------------------------------------------------product_category_update-----------------------------------------------------
+
+    app.post("/api/admin/product_category_update", (req, res) => {
+        var reqObj = req.body;
+        var condition='';
+        checkAccessToken(req.headers, res, (uObj) => {
+                helper.CheckParameterValid(res, reqObj, ["cat_id", "cat_name", "color"], () => {
+                    db.query("UPDATE `category_detail` SET `cat_name`=?," + condition + " `color`=?,`modify_date`=NOW() WHERE `cat_id`= ? AND `status` = ?", [
+                        reqObj.cat_name, reqObj.color, reqObj.cat_id, "1"
+                    ], (err, result) => {
+
+                        if (err) {
+                            helper.ThrowHtmlError(err, res);
+                            return;
+                        }
+
+                        if (result) {
+                            res.json({
+                                "status": "1", "payload": {
+                                    "cat_id": parseInt(reqObj.cat_id[0]),
+                                    "cat_name": reqObj.cat_name[0],
+                                    "color": reqObj.color[0],
+                                    "image":'',
+                                }, "message": msg_category_update
+                            });
+                        } else {
+                            res.json({ "status": "0", "message": msg_fail })
+                        }
+
+                    })
+        })
+    })
+
+    })
+// ----------------------------------------------------------------delete_category---------------------------------------------------
+    app.post('/api/admin/product_category_delete', (req, res) => {
+        helper.Dlog(req.body);
+        var reqObj = req.body;
+
+        helper.CheckParameterValid(res, reqObj, ["cat_id"], () => {
+
+            checkAccessToken(req.headers, res, (uObj) => {
+                db.query("UPDATE `category_detail` SET `status`= ?, `modify_date` = NOW() WHERE `cat_id`= ? ", [
+                    "2", reqObj.cat_id,
+                ], (err, result) => {
+
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return;
+                    }
+
+                    if (result.affectedRows > 0) {
+                        res.json({
+                            "status": "1", "message": msg_category_delete
+                        });
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
+
+                })
+            }, "2")
+        })
+    })
+// ---------------------------------------------------
+    app.post('/api/admin/product_category_list', (req, res) => {
+        helper.Dlog(req.body);
+        var reqObj = req.body;
+
+        checkAccessToken(req.headers, res, (uObj) => {
+            db.query("SELECT `cat_id`, `cat_name`, `image` , `color` FROM `category_detail` WHERE `status`= ? ", [
+                "1"
+            ], (err, result) => {
+
+                if (err) {
+                    helper.ThrowHtmlError(err, res);
+                    return;
+                }
+
+                res.json({
+                    "status": "1", "payload": result
+                });
+            })
+        }, "2")
+    })
+    //////////////////////////////////////////////////////end category////////////////////////////////////////////
+
+       ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+       app.post("/api/admin/product_add", (req, res) => {
+        checkAccessToken(req.headers, res, (uObj) => {
+            var reqObj = req.body;
+                helper.Dlog("---------- Parameter ----")
+                helper.Dlog(reqObj)
+                helper.CheckParameterValid(res, reqObj, ["name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price", ], () => {
+                        db.query("INSERT INTO `product_detail`(`cat_id`, `brand_id`, `type_id`, `name`, `detail`, `unit_name`, `unit_value`, `nutrition_weight`, `price`, `created_date`, `modify_date`) VALUES (?,?,?, ?,?,?, ?,?,?, NOW(), NOW() ) ", [reqObj.cat_id, reqObj.brand_id, reqObj.type_id, reqObj.name, reqObj.detail, reqObj.unit_name, reqObj.unit_value, reqObj.nutrition_weight, reqObj.price], (err, result) => {
+                            if (err) {
+                                helper.ThrowHtmlError(err, res);
+                                return
+                            }
+                            if (result) {
+
+                                res.json({
+                                    "status": "1", "message": msg_product_added
+                                });
+
+                            } else {
+                                res.json({ "status": "0", "message": msg_fail })
+                            }
+                        })
+            })
+
+        })
+    })
+
+    app.post('/api/admin/product_update', (req, res) => {
+        helper.Dlog(req.body);
+        var reqObj = req.body;
+
+        helper.CheckParameterValid(res, reqObj, ["prod_id", "name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price"], () => {
+
+            checkAccessToken(req.headers, res, (uObj) => {
+
+                db.query("UPDATE `product_detail` SET `cat_id`=?,`brand_id`=?,`type_id`=?,`name`=?,`detail`=?,`unit_name`=?,`unit_value`=?,`nutrition_weight`=?,`price`=?, `modify_date`=NOW() WHERE  `prod_id`= ? AND `status` = ? ", [
+                    reqObj.cat_id, reqObj.brand_id, reqObj.type_id, reqObj.name, reqObj.detail, reqObj.unit_name, reqObj.unit_value, reqObj.nutrition_weight, reqObj.price, reqObj.prod_id, "1"
+                ], (err, result) => {
+
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return;
+                    }
+
+                    if (result.affectedRows > 0) {
+                        res.json({
+                            "status": "1", "message": msg_product_update
+                        });
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
+
+                })
+            }, "2")
+        })
+    })
+
+    app.delete('/api/admin/product_delete/:id', (req, res) => {
+        helper.Dlog(req.body);
+        var reqObj = req.body;
+            checkAccessToken(req.headers, res, (uObj) => {
+                // db.query("UPDATE `category_detail` SET `status`= ?, `modify_date` = NOW() WHERE `cat_id`= ? ", [
+                //     "2", reqObj.cat_id,
+                // ], (err, result) => {'DELETE FROM tax WHERE tax_id=?', [ reqObj.prod_id]
+                db.query('DELETE FROM product_detail WHERE prod_id=?', [req.params.id], (err, result) => {
+
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return;
+                    }
+
+                    if (result.affectedRows > 0) {
+                        res.json({
+                            "status": "1", "message": msg_product_delete
+                        });
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
+
+                })
+            }, "2")
+    })
+    // ______________________________________________________________
+    app.post('/api/admin/product_list', (req, res) => {
+        checkAccessToken(req.headers, res, (uObj) => {
+            db.query("SELECT * FROM  product_detail   ORDER BY prod_id DESC ", [
+                "1"
+            ], (err, result) => {
+
+                if (err) {
+                    helper.ThrowHtmlError(err, res);
+                    return;
+                }
+
+                res.json({
+                    "status": "1", "payload": result
+                });
+            })
+        }, "2")
+
+    })
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
     app.post('/api/admin/brand_add', (req, res) => {
+        //aman
         helper.Dlog(req.body);
         var reqObj = req.body;
 
@@ -233,186 +456,7 @@ module.exports.controller = (app, io, socket_list) => {
             })
         }, "2")
     })
-
-    app.post("/api/admin/product_category_add", (req, res) => {
-        var form = new multiparty.Form();
-
-        checkAccessToken(req.headers, res, (uObj) => {
-
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["cat_name", "color"], () => {
-                    helper.CheckParameterValid(res, files, ["image"], () => {
-                        var extension = files.image[0].originalFilename.substring(files.image[0].originalFilename.lastIndexOf(".") + 1);
-
-                        var imageFileName = "category/" + helper.fileNameGenerate(extension);
-                        var newPath = imageSavePath + imageFileName;
-
-                        fs.rename(files.image[0].path, newPath, (err) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return
-                            } else {
-                                db.query("INSERT INTO `category_detail`( `cat_name`, `image`, `color`, `created_date`, `modify_date`) VALUES  (?,?,?, NOW(), NOW())", [
-                                    reqObj.cat_name[0], imageFileName, reqObj.color[0]
-                                ], (err, result) => {
-
-                                    if (err) {
-                                        helper.ThrowHtmlError(err, res);
-                                        return;
-                                    }
-
-                                    if (result) {
-                                        res.json({
-                                            "status": "1", "payload": {
-                                                "cat_id": result.insertId,
-                                                "cat_name": reqObj.cat_name[0],
-                                                "color": reqObj.color[0],
-                                                "image": helper.ImagePath() + imageFileName,
-                                            }, "message": msg_category_added
-                                        });
-                                    } else {
-                                        res.json({ "status": "0", "message": msg_fail })
-                                    }
-
-                                })
-                            }
-                        })
-                    })
-                })
-
-            })
-
-        })
-    })
-
-    app.post("/api/admin/product_category_update", (req, res) => {
-        var form = new multiparty.Form();
-
-        checkAccessToken(req.headers, res, (uObj) => {
-
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["cat_id", "cat_name", "color"], () => {
-
-                    var condition = "";
-                    var imageFileName = "";
-
-                    if (files.image != undefined || files.image != null) {
-                        var extension = files.image[0].originalFilename.substring(files.image[0].originalFilename.lastIndexOf(".") + 1);
-
-                        imageFileName = "category/" + helper.fileNameGenerate(extension);
-                        var newPath = imageSavePath + imageFileName;
-
-                        condition = " `image` = '" + imageFileName + "', ";
-                        fs.rename(files.image[0].path, newPath, (err) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err);
-                                return
-                            } else {
-
-                            }
-                        })
-                    }
-
-
-                    db.query("UPDATE `category_detail` SET `cat_name`=?," + condition + " `color`=?,`modify_date`=NOW() WHERE `cat_id`= ? AND `status` = ?", [
-                        reqObj.cat_name[0], reqObj.color[0], reqObj.cat_id[0], "1"
-                    ], (err, result) => {
-
-                        if (err) {
-                            helper.ThrowHtmlError(err, res);
-                            return;
-                        }
-
-                        if (result) {
-                            res.json({
-                                "status": "1", "payload": {
-                                    "cat_id": parseInt(reqObj.cat_id[0]),
-                                    "cat_name": reqObj.cat_name[0],
-                                    "color": reqObj.color[0],
-                                    "image": helper.ImagePath() + imageFileName,
-                                }, "message": msg_category_update
-                            });
-                        } else {
-                            res.json({ "status": "0", "message": msg_fail })
-                        }
-
-                    })
-                })
-
-            })
-
-        })
-    })
-
-    app.post('/api/admin/product_category_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["cat_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `category_detail` SET `status`= ?, `modify_date` = NOW() WHERE `cat_id`= ? ", [
-                    "2", reqObj.cat_id,
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_category_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/product_category_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `cat_id`, `cat_name`,  (CASE WHEN `image` != '' THEN CONCAT('" + helper.ImagePath() + "','',`image`)  ELSE `image` END) AS `image` , `color` FROM `category_detail` WHERE `status`= ? ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
-                res.json({
-                    "status": "1", "payload": result
-                });
-            })
-        }, "2")
-    })
+ //////////////////////////////////////////////////////end brand////////////////////////////////////////////
 
     app.post("/api/admin/product_type_add", (req, res) => {
         var form = new multiparty.Form();
@@ -424,7 +468,6 @@ module.exports.controller = (app, io, socket_list) => {
                     helper.ThrowHtmlError(err, res);
                     return
                 }
-
                 helper.Dlog("---------- Parameter ----")
                 helper.Dlog(reqObj)
                 helper.Dlog("---------- Files ----")
@@ -594,175 +637,10 @@ module.exports.controller = (app, io, socket_list) => {
         }, "2")
     })
 
-    app.post("/api/admin/product_add", (req, res) => {
-        var form = new multiparty.Form();
 
-        checkAccessToken(req.headers, res, (uObj) => {
+ 
 
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price", "nutrition_data"], () => {
-                    helper.CheckParameterValid(res, files, ["image"], () => {
-                        var imageNamePathArr = []
-                        var fullImageNamePathArr = [];
-                        files.image.forEach(imageFile => {
-                            var extension = imageFile.originalFilename.substring(imageFile.originalFilename.lastIndexOf(".") + 1);
-                            var imageFileName = "product/" + helper.fileNameGenerate(extension);
-
-                            imageNamePathArr.push(imageFileName);
-                            fullImageNamePathArr.push(helper.ImagePath() + imageFileName);
-                            saveImage(imageFile, imageSavePath + imageFileName);
-                        });
-
-                        helper.Dlog(imageNamePathArr);
-                        helper.Dlog(fullImageNamePathArr);
-
-                        db.query("INSERT INTO `product_detail`(`cat_id`, `brand_id`, `type_id`, `name`, `detail`, `unit_name`, `unit_value`, `nutrition_weight`, `price`, `created_date`, `modify_date`) VALUES (?,?,?, ?,?,?, ?,?,?, NOW(), NOW() ) ", [reqObj.cat_id[0], reqObj.brand_id[0], reqObj.type_id[0], reqObj.name[0], reqObj.detail[0], reqObj.unit_name[0], reqObj.unit_value[0], reqObj.nutrition_weight[0], reqObj.price[0]], (err, result) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return
-                            }
-
-                            if (result) {
-
-
-
-                                var nutritionInsertData = []
-
-                                var nutritionDataArr = JSON.parse(reqObj.nutrition_data[0])
-
-                                nutritionDataArr.forEach(nObj => {
-                                    nutritionInsertData.push([result.insertId, nObj.nutrition_name, nObj.nutrition_value]);
-                                });
-
-
-
-                                if (nutritionDataArr.length > 0) {
-                                    db.query("INSERT INTO `nutrition_detail`(`prod_id`, `nutrition_name`, `nutrition_value`) VALUES ? ", [nutritionInsertData], (err, nResult) => {
-                                        if (err) {
-                                            helper.ThrowHtmlError(err, res);
-                                            return
-                                        }
-
-                                        if (nResult) {
-                                            helper.Dlog(" nutritionInsert succes");
-                                        } else {
-                                            // res.json({ "status": "0", "message": msg_fail })
-                                            helper.Dlog(" nutritionInsert fail");
-                                        }
-
-
-                                    })
-                                }
-
-                                var imageInsertArr = []
-
-                                imageNamePathArr.forEach(imagePath => {
-                                    imageInsertArr.push([result.insertId, imagePath]);
-                                });
-
-                                db.query("INSERT INTO `image_detail`(`prod_id`, `image`) VALUES ? ", [imageInsertArr], (err, iResult) => {
-                                    if (err) {
-                                        helper.ThrowHtmlError(err, res);
-                                        return
-                                    }
-
-                                    if (iResult) {
-                                        helper.Dlog(" imageInsertArr succes");
-                                    } else {
-                                        helper.Dlog(" imageInsertArr fail");
-                                    }
-
-                                })
-
-
-                                res.json({
-                                    "status": "1", "message": msg_product_added
-                                });
-
-                            } else {
-                                res.json({ "status": "0", "message": msg_fail })
-                            }
-                        })
-
-
-                    })
-                })
-
-            })
-
-        })
-    })
-
-    app.post('/api/admin/product_update', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("UPDATE `product_detail` SET `cat_id`=?,`brand_id`=?,`type_id`=?,`name`=?,`detail`=?,`unit_name`=?,`unit_value`=?,`nutrition_weight`=?,`price`=?, `modify_date`=NOW() WHERE  `prod_id`= ? AND `status` = ? ", [
-                    reqObj.cat_id, reqObj.brand_id, reqObj.type_id, reqObj.name, reqObj.detail, reqObj.unit_name, reqObj.unit_value, reqObj.nutrition_weight, reqObj.price, reqObj.prod_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_product_update
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/product_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("UPDATE `product_detail` SET `status`=?,`modify_date`=NOW() WHERE  `prod_id`= ? AND `status` = ? ", [
-                    "2", reqObj.prod_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_product_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
+    // ----------------------------------------------------------------------------------------------------------------------
     app.post('/api/admin/product_nutrition_add', (req, res) => {
         helper.Dlog(req.body);
         var reqObj = req.body;
@@ -940,37 +818,7 @@ module.exports.controller = (app, io, socket_list) => {
         })
     })
 
-    app.post('/api/admin/product_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `pd`.`prod_id`, `pd`.`cat_id`, `pd`.`brand_id`, `pd`.`type_id`, `pd`.`name`, `pd`.`detail`, `pd`.`unit_name`, `pd`.`unit_value`, `pd`.`nutrition_weight`, `pd`.`price`, `pd`.`created_date`, `pd`.`modify_date`, `cd`.`cat_name`, IFNULL( `bd`.`brand_name`, '' ) AS `brand_name` , `td`.`type_name`, (CASE WHEN `imd`.`image` != '' THEN CONCAT('" + image_base_url + "', '', `imd`.`image`) ELSE '' END ) AS `image`, IFNULL (`od`.`price`, `pd`.`price`) AS `offer_price`,  AVG( CASE WHEN `rd`.`rate` IS NOT NULL THEN `rd`.`rate` ELSE 5.0 END ) AS `avg_rating` FROM `product_detail` AS  `pd` " +
-                "INNER JOIN `category_detail` AS `cd` ON `pd`.`cat_id` = `cd`.`cat_id` " +
-                "LEFT JOIN `brand_detail` AS `bd` ON `pd`.`brand_id` = `bd`.`brand_id` " +
-                "LEFT JOIN `offer_detail` AS `od` ON `od`.`prod_id` = `pd`.`prod_id` AND `od`.`status` = 1 AND `od`.`start_date` <= NOW() AND `od`.`end_date` >= NOW() " +
-                "INNER JOIN `type_detail` AS `td` ON `pd`.`type_id` = `td`.`type_id` " +
-                "INNER JOIN `image_detail` AS `imd` ON `imd`.`prod_id` = `pd`.`prod_id` AND `imd`.`status` = 1 " +
-                "LEFT JOIN `review_detail` AS `rd` ON `rd`.`prod_id` = `pd`.`prod_id` " +
-                " WHERE `pd`.`status` = ? GROUP BY `pd`.`prod_id` ORDER BY `pd`.`prod_id` DESC ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
-                res.json({
-                    "status": "1", "payload": result
-                });
-
-            })
-        }, "2")
-
-    })
-
+  
     app.post('/api/admin/product_category_type_brand_list', (req, res) => {
         helper.Dlog(req.body);
         checkAccessToken(req.headers, res, () => {
@@ -1024,7 +872,7 @@ module.exports.controller = (app, io, socket_list) => {
 
 
             "SELECT `img_id`, `prod_id`, (CASE WHEN `image` != '' THEN CONCAT('" + image_base_url + "', '', `image`) ELSE '' END ) AS `image` FROM `image_detail` WHERE `prod_id` = ? AND `status` = ? ;" +
-            
+
             "SELECT `rd`.`review_id`, `rd`.`prod_id`, `rd`.`user_id`, `rd`.`rate`, `rd`.`message`, `rd`.`created_date`, `ud`.`name` FROM `review_detail` AS `rd`  " +
             "INNER JOIN `user_detail` AS `ud` ON `ud`.`user_id` = `rd`.`user_id` AND `rd`.`prod_id` = ? ORDER BY `rd`.`review_id` DESC ", [
 
