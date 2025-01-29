@@ -78,6 +78,7 @@ Array.prototype.swap = (x, y) => {
   return this;
 }
 
+
 Array.prototype.insert = (index, item) => {
   this.splice(index, 0, item);
 }
