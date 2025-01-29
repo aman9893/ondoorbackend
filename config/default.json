@@ -1,16 +1,6 @@
 {
+
     "dbConfig": {
-        "host":"bn4gpxknm8veaeekzrnn-mysql.services.clever-cloud.com",
-        "user":"utbocl6f4grfgukr",
-        "password":"tp6buOst1NSVK7ao6s1i",
-        "database":"bn4gpxknm8veaeekzrnn",
-        "multipleStatements": true,
-        "port":3306
-   
-    },
-
-
-    "dbConfig2": {
         "host":"localhost",
         "user":"root",
         "password":"",
