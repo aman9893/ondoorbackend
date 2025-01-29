@@ -15,7 +15,7 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
   cors: {
     origin: "http://localhost:4200",
-    origin: "https://ondoorbackend.vercel.app/",
+    // origin: "https://ondoorbackend.vercel.app/",
     methods: ["GET", "POST"]
   }
 })
@@ -38,7 +38,7 @@ app.use('/users', usersRouter);
 
 const corsOptions = {
   origin: "http://localhost:4200",
-  origin: "https://ondoorbackend.vercel.app/",
+  // origin: "https://ondoorbackend.vercel.app/",
   
 }
 
