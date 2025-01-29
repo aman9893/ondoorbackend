@@ -11,7 +11,13 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 var server = require('http').createServer(app);
-
+var io = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:4200",
+    // origin: "https://ondoorbackend.vercel.app/",
+    methods: ["GET", "POST"]
+  }
+})
 var serverPort = 3001;
 
 var user_socket_connect_list = [];
@@ -31,7 +37,7 @@ app.use('/users', usersRouter);
 
 const corsOptions = {
   origin: "http://localhost:4200",
-  origin: "https://ondoorbackend.vercel.app/",
+  // origin: "https://ondoorbackend.vercel.app/",
   
 }
 
@@ -51,15 +57,15 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-// app.use(function (err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function (err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
 
 
 
