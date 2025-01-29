@@ -11,12 +11,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server, {
-  cors: {
-     origin: "https://ondoorbackend.vercel.app/",
-    methods: ["GET", "POST"]
-  }
-})
+
 var serverPort = 3001;
 
 var user_socket_connect_list = [];
