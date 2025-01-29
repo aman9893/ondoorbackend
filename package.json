@@ -2,10 +2,8 @@
   "name": "food-delivery",
   "version": "0.0.0",
   "private": true,
-  "main": "index.js",
-
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "config": "^3.3.9",
