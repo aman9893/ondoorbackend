@@ -35,14 +35,28 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-const corsOptions = {
-  // origin: "http://localhost:4200",
- origin: "https://ondoorveggi.vercel.app/",
-  
-}
+const corsOpts = {
+  origin: '*',
 
-app.use(cors(corsOptions));
+  methods: [
+    'GET',
+    'POST',
+  ],
 
+  allowedHeaders: [
+    'Content-Type',
+  ],
+};
+
+app.use(cors(corsOpts));
+
+app.use(function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  next();
+});
 // import express inside dynamic added.
 fs.readdirSync('./controllers').forEach((file) => {
   if (file.substr(-3) == ".js") {
