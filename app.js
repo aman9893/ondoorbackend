@@ -75,8 +75,6 @@ fs.readdirSync('./controllers').forEach((file) => {
     route.controller(app, io, user_socket_connect_list);
   }
 })
-app.set('views', path.join(__dirname,'views'));
-app.set('view engine','html');
 
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
