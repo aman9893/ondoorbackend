@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 const cors = require('cors');
 var fs = require('fs');
 
@@ -14,8 +13,7 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
   cors: {
-    origin: "http://localhost:4200",
-    // origin: "https://ondoorbackend.vercel.app/",
+     origin: "https://ondoorbackend.vercel.app/",
     methods: ["GET", "POST"]
   }
 })
@@ -38,7 +36,7 @@ app.use('/users', usersRouter);
 
 const corsOptions = {
   origin: "http://localhost:4200",
-  // origin: "https://ondoorbackend.vercel.app/",
+  origin: "https://ondoorbackend.vercel.app/",
   
 }
 
@@ -67,6 +65,13 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
+app.get('/test', (req, res) => {
+  res.send("hello hotel")
+  console.log("Hello hotel")
+})
 
 module.exports = app;
 
