@@ -55,8 +55,19 @@ app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Access-Control-Allow-Credentials', true);
+  
   next();
 });
+
+app.use((req, res, next) => {
+  //allow access to current url. work for https as well
+  res.setHeader('Access-Control-Allow-Origin',req.header('Origin'));
+  res.removeHeader('x-powered-by');
+  //allow access to current method
+  res.setHeader('Access-Control-Allow-Methods',req.method);
+  res.setHeader('Access-Control-Allow-Headers','Content-Type');
+  next();
+})
 // import express inside dynamic added.
 fs.readdirSync('./controllers').forEach((file) => {
   if (file.substr(-3) == ".js") {
@@ -64,7 +75,27 @@ fs.readdirSync('./controllers').forEach((file) => {
     route.controller(app, io, user_socket_connect_list);
   }
 })
+app.set('views', path.join(__dirname,'views'));
+app.set('view engine','html');
 
+app.use(express.urlencoded({extended: false}))
+app.use(express.json())
+
+app.use((req, res, next) => {
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+  app.use(cors());
+  app.all('*', function(req, res, next) {
+   res.header("Access-Control-Allow-Origin", "*");
+   res.header("Access-Control-Allow-Headers", "X-Requested-With");
+   next();
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
