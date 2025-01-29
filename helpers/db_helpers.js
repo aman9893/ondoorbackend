@@ -14,7 +14,17 @@ reconnect(db, () => {});
 function reconnect(connection, callback) {
     helper.Dlog("\n New connection tentative ... (" + helper.serverYYYYMMDDHHmmss() + ")" )
 
-    connection = mysql.createConnection(dbConfig);
+    // connection = mysql.createConnection(dbConfig);
+     connection = mysql.createConnection({
+        host: process.env.DB_HOST, 
+        user: process.env.DB_USERNAME, 
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DBNAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0
+    });
+
     connection.connect((err) => {
         if(err) {
             helper.ThrowHtmlError(err);
