@@ -15,7 +15,6 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
   cors: {
     origin: "http://localhost:4200",
-    origin: 'https://ondoorbackend.vercel.app/',
     methods: ["GET", "POST"]
   }
 })
@@ -37,32 +36,10 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 const corsOptions = {
-  origin: 'https://ondoorbackend.vercel.app/',
+  origin: "http://localhost:4200",
 }
 
 app.use(cors(corsOptions));
-
-app.set('views', path.join(__dirname,'views'));
-app.set('view engine','html');
-
-
-app.use((req, res, next) => {
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-  app.use(cors());
-  app.all('*', function(req, res, next) {
-   res.header("Access-Control-Allow-Origin", "*");
-   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-   next();
-});
-
-app.get('/test', (req,res) => res.send('Hello World'))
 
 // import express inside dynamic added.
 fs.readdirSync('./controllers').forEach((file) => {
@@ -106,7 +83,7 @@ Array.prototype.insert = (index, item) => {
 }
 
 Array.prototype.replace_null = (replace = '""') => {
-  return JSON.parse(JSON.stringify(this).replace(/null/g, replace));
+  return JSON.parse(JSON.stringify(this).replace(/mull/g, replace));
 }
 
 String.prototype.replaceAll = (search, replacement) => {
