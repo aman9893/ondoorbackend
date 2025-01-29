@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var router = express.Router();
 
 const cors = require('cors');
 var fs = require('fs');
@@ -12,15 +13,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 var server = require('http').createServer(app);
-var io = require('socket.io')(server, {
-  cors: {
-    origin: "http://localhost:4200",
-    origin: 'https://ondoorbackend.vercel.app/',
-    methods: ["GET", "POST"]
-  }
-})
 var serverPort = 3001;
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -63,7 +56,14 @@ app.use(function(req, res, next) {
 
 app.get('/test', (req,res) => res.send('Hello World'))
 
+router.get('/', function(req, res, next) {
+    res.render('index', { title: 'Express' });
+  });
 
+  router.get('/', function(req, res, next) {
+    res.send('respond with a resource');
+  });
+  
 module.exports = app;
 
 server.listen(serverPort);
