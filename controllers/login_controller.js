@@ -293,7 +293,6 @@ module.exports.controller = (app, io, socket_list) => {
         helper.Dlog(req.body)
         var reqObj = req.body;
 
-        checkAccessToken(req.headers, res, (userObj) => {
 
             db.query("SELECT `cat_id`, `cat_name`, `image` , `color` FROM `category_detail` WHERE `status` = 1 ", [], (err, result) => {
                 if (err) {
@@ -307,7 +306,6 @@ module.exports.controller = (app, io, socket_list) => {
                     "message": msg_success
                 })
 
-            })
         }, '1')
     })
 
@@ -315,7 +313,6 @@ module.exports.controller = (app, io, socket_list) => {
         helper.Dlog(req.body)
         var reqObj = req.body;
 
-        checkAccessToken(req.headers, res, (userObj) => {
             helper.CheckParameterValid(res, reqObj, ["cat_id"], () => {
 
 
@@ -335,7 +332,6 @@ module.exports.controller = (app, io, socket_list) => {
                         })
 
                     })
-            })
         }, '1')
     })
 
