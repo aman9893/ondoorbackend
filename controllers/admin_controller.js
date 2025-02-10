@@ -11,48 +11,16 @@ const msg_fail = "fail";
 module.exports.controller = (app, io, socket_list) => {
 
     const msg_invalidUser = "invalid username and password";
-    const msg_already_register = "this email already register ";
-    const msg_brand_added = "Brand added Successfully.";
-    const msg_brand_update = "Brand updated Successfully.";
-    const msg_brand_delete = "Brand deleted Successfully.";
-
 
     const msg_category_added = "Category added Successfully.";
     const msg_category_update = "Category updated Successfully.";
     const msg_category_delete = "Category deleted Successfully.";
 
-    const msg_type_added = "Type added Successfully.";
-    const msg_type_update = "Type updated Successfully.";
-    const msg_type_delete = "Type deleted Successfully.";
-
     const msg_product_added = "Product added Successfully.";
     const msg_product_update = "Product updated Successfully.";
     const msg_product_delete = "Product deleted Successfully.";
 
-    const msg_nutrition_added = "nutrition added Successfully.";
-    const msg_nutrition_update = "nutrition updated Successfully.";
-    const msg_nutrition_delete = "nutrition deleted Successfully.";
-
-    const msg_product_image_added = "Product image added Successfully.";
-    const msg_product_image_delete = "Product image deleted Successfully.";
-
-    const msg_zone_added = "zone added Successfully.";
-    const msg_zone_update = "zone updated Successfully.";
-    const msg_zone_delete = "zone deleted Successfully.";
-
-    const msg_area_added = "area added Successfully.";
-    const msg_area_update = "area updated Successfully.";
-    const msg_area_delete = "area deleted Successfully.";
-
-    const msg_offer_added = "offer added Successfully.";
-    const msg_offer_delete = "offer deleted Successfully.";
-
-    const msg_already_added = "this value already added here";
-    const msg_added = "already added here";
-
-    const msg_promo_code_added = "promo code added Successfully.";
-    const msg_promo_code_update = "promo code updated Successfully.";
-    const msg_promo_code_delete = "promo code deleted Successfully.";
+  
 
     app.post('/api/admin/login', (req, res) => {
         helper.Dlog(req.body);
@@ -102,7 +70,7 @@ module.exports.controller = (app, io, socket_list) => {
     })
 
 
-    // ----------------------------------------- category_add  ----------------------------------------------------------------
+    // ----------------------------------------- --Category_add  ----------------------------------------------------------------
     app.post("/api/admin/product_category_add", (req, res) => {
         //aman
         var reqObj = req.body;
@@ -132,41 +100,41 @@ module.exports.controller = (app, io, socket_list) => {
             })
         })
     })
-// ----------------------------------------------------product_category_update-----------------------------------------------------
+    // ----------------------------------------------------product_category_update-----------------------------------------------------
 
     app.post("/api/admin/product_category_update", (req, res) => {
         var reqObj = req.body;
-        var condition='';
+        var condition = '';
         checkAccessToken(req.headers, res, (uObj) => {
-                helper.CheckParameterValid(res, reqObj, ["cat_id", "cat_name", "color"], () => {
-                    db.query("UPDATE `category_detail` SET `cat_name`=?," + condition + " `color`=?,`modify_date`=NOW() WHERE `cat_id`= ? AND `status` = ?", [
-                        reqObj.cat_name, reqObj.color, reqObj.cat_id, "1"
-                    ], (err, result) => {
+            helper.CheckParameterValid(res, reqObj, ["cat_id", "cat_name", "color"], () => {
+                db.query("UPDATE `category_detail` SET `cat_name`=?," + condition + " `color`=?,`modify_date`=NOW() WHERE `cat_id`= ? AND `status` = ?", [
+                    reqObj.cat_name, reqObj.color, reqObj.cat_id, "1"
+                ], (err, result) => {
 
-                        if (err) {
-                            helper.ThrowHtmlError(err, res);
-                            return;
-                        }
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return;
+                    }
 
-                        if (result) {
-                            res.json({
-                                "status": "1", "payload": {
-                                    "cat_id": parseInt(reqObj.cat_id[0]),
-                                    "cat_name": reqObj.cat_name[0],
-                                    "color": reqObj.color[0],
-                                    "image":'',
-                                }, "message": msg_category_update
-                            });
-                        } else {
-                            res.json({ "status": "0", "message": msg_fail })
-                        }
+                    if (result) {
+                        res.json({
+                            "status": "1", "payload": {
+                                "cat_id": parseInt(reqObj.cat_id[0]),
+                                "cat_name": reqObj.cat_name[0],
+                                "color": reqObj.color[0],
+                                "image": '',
+                            }, "message": msg_category_update
+                        });
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
 
-                    })
+                })
+            })
         })
-    })
 
     })
-// ----------------------------------------------------------------delete_category---------------------------------------------------
+    // ----------------------------------------------------------------delete_category---------------------------------------------------
     app.post('/api/admin/product_category_delete', (req, res) => {
         helper.Dlog(req.body);
         var reqObj = req.body;
@@ -195,7 +163,7 @@ module.exports.controller = (app, io, socket_list) => {
             }, "2")
         })
     })
-// ---------------------------------------------------
+    // ---------------------------------------------------
     app.post('/api/admin/product_category_list', (req, res) => {
         helper.Dlog(req.body);
         var reqObj = req.body;
@@ -216,31 +184,30 @@ module.exports.controller = (app, io, socket_list) => {
             })
         }, "2")
     })
-    //////////////////////////////////////////////////////end category////////////////////////////////////////////
 
-       ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////============Product list===========//////////////////////////////////////////////////////////////////
 
-       app.post("/api/admin/product_add", (req, res) => {
+    app.post("/api/admin/product_add", (req, res) => {
         checkAccessToken(req.headers, res, (uObj) => {
             var reqObj = req.body;
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.CheckParameterValid(res, reqObj, ["name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price", ], () => {
-                        db.query("INSERT INTO `product_detail`(`cat_id`, `brand_id`, `type_id`, `name`, `detail`, `unit_name`, `unit_value`, `nutrition_weight`, `price`, `created_date`, `modify_date`) VALUES (?,?,?, ?,?,?, ?,?,?, NOW(), NOW() ) ", [reqObj.cat_id, reqObj.brand_id, reqObj.type_id, reqObj.name, reqObj.detail, reqObj.unit_name, reqObj.unit_value, reqObj.nutrition_weight, reqObj.price], (err, result) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return
-                            }
-                            if (result) {
+            helper.Dlog("---------- Parameter ----")
+            helper.Dlog(reqObj)
+            helper.CheckParameterValid(res, reqObj, ["name", "detail", "cat_id", "brand_id", "type_id", "unit_name", "unit_value", "nutrition_weight", "price",], () => {
+                db.query("INSERT INTO `product_detail`(`cat_id`, `brand_id`, `type_id`, `name`, `detail`, `unit_name`, `unit_value`, `nutrition_weight`, `price`, `created_date`, `modify_date`) VALUES (?,?,?, ?,?,?, ?,?,?, NOW(), NOW() ) ", [reqObj.cat_id, reqObj.brand_id, reqObj.type_id, reqObj.name, reqObj.detail, reqObj.unit_name, reqObj.unit_value, reqObj.nutrition_weight, reqObj.price], (err, result) => {
+                    if (err) {
+                        helper.ThrowHtmlError(err, res);
+                        return
+                    }
+                    if (result) {
 
-                                res.json({
-                                    "status": "1", "message": msg_product_added
-                                });
+                        res.json({
+                            "status": "1", "message": msg_product_added
+                        });
 
-                            } else {
-                                res.json({ "status": "0", "message": msg_fail })
-                            }
-                        })
+                    } else {
+                        res.json({ "status": "0", "message": msg_fail })
+                    }
+                })
             })
 
         })
@@ -279,29 +246,28 @@ module.exports.controller = (app, io, socket_list) => {
     app.delete('/api/admin/product_delete/:id', (req, res) => {
         helper.Dlog(req.body);
         var reqObj = req.body;
-            checkAccessToken(req.headers, res, (uObj) => {
-                // db.query("UPDATE `category_detail` SET `status`= ?, `modify_date` = NOW() WHERE `cat_id`= ? ", [
-                //     "2", reqObj.cat_id,
-                // ], (err, result) => {'DELETE FROM tax WHERE tax_id=?', [ reqObj.prod_id]
-                db.query('DELETE FROM product_detail WHERE prod_id=?', [req.params.id], (err, result) => {
+        checkAccessToken(req.headers, res, (uObj) => {
+            // db.query("UPDATE `category_detail` SET `status`= ?, `modify_date` = NOW() WHERE `cat_id`= ? ", [
+            //     "2", reqObj.cat_id,
+            // ], (err, result) => {'DELETE FROM tax WHERE tax_id=?', [ reqObj.prod_id]
+            db.query('DELETE FROM product_detail WHERE prod_id=?', [req.params.id], (err, result) => {
 
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
+                if (err) {
+                    helper.ThrowHtmlError(err, res);
+                    return;
+                }
 
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_product_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
+                if (result.affectedRows > 0) {
+                    res.json({
+                        "status": "1", "message": msg_product_delete
+                    });
+                } else {
+                    res.json({ "status": "0", "message": msg_fail })
+                }
 
-                })
-            }, "2")
+            })
+        }, "2")
     })
-    // ______________________________________________________________
     app.post('/api/admin/product_list', (req, res) => {
         checkAccessToken(req.headers, res, (uObj) => {
             db.query("SELECT * FROM  product_detail   ORDER BY prod_id DESC ", [
@@ -321,1095 +287,485 @@ module.exports.controller = (app, io, socket_list) => {
 
     })
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    app.post('/api/admin/brand_add', (req, res) => {
-        //aman
-        helper.Dlog(req.body);
-        var reqObj = req.body;
+    // ========================================================contact book ===============================///////////////////////////////////////
 
-        helper.CheckParameterValid(res, reqObj, ["brand_name"], () => {
 
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("SELECT `brand_id`, `brand_name` FROM `brand_detail` WHERE `brand_name`  = ? AND `status` = ?", [reqObj.brand_name, "1"], (err, result) => {
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.length > 0) {
-                        //already added this brand
-
-                        res.json({ "status": "1", "payload": result[0], "message": msg_already_added });
-
-                    } else {
-                        db.query("INSERT INTO `brand_detail`( `brand_name`, `created_date`, `modify_date`) VALUES (?, NOW(), NOW())", [
-                            reqObj.brand_name
-                        ], (err, result) => {
-
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return;
-                            }
-
-                            if (result) {
-                                res.json({
-                                    "status": "1", "payload": {
-                                        "brand_id": result.insertId,
-                                        "brand_name": reqObj.brand_name,
-                                    }, "message": msg_brand_added
-                                });
-                            } else {
-                                res.json({ "status": "0", "message": msg_fail })
-                            }
-
-                        })
-
-                    }
-                })
-
-            }, "2")
+    app.get('/api/contactbook_list', (req, res) => {
+        db.query('SELECT * FROM contact_book ORDER BY contact_id DESC ', (err, result) => {
+            if (err) throw err;
+            res.end(JSON.stringify(result));
         })
     })
 
-    app.post('/api/admin/brand_update', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["brand_id", "brand_name"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-
-                db.query("UPDATE `brand_detail` SET `brand_name`= ?, `modify_date` = NOW() WHERE `brand_id`= ? AND `status` = ? ", [
-                    reqObj.brand_name, reqObj.brand_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_brand_update
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-
-
-
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/brand_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["brand_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `brand_detail` SET `status`= ?, `modify_date` = NOW() WHERE `brand_id`= ? ", [
-                    "2", reqObj.brand_id,
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_brand_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/brand_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `brand_id`, `brand_name` FROM `brand_detail` WHERE `status`= ? ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
+    app.post('/api/add_contactbook', (req, res) => {
+        var users = {
+            "user_id": req.body.user_id,
+            "contact_name": req.body.contact_name,
+            "contact_number": req.body.contact_number,
+            "contact_email": req.body.contact_email,
+            "contact_status": req.body.contact_status,
+        }
+        db.query('SELECT * FROM contact_book WHERE contact_number = ?', [req.body.contact_number], function (error, results, fields) {
+            if (results.length > 0) {
                 res.json({
-                    "status": "1", "payload": result
-                });
-            })
-        }, "2")
-    })
- //////////////////////////////////////////////////////end brand////////////////////////////////////////////
-
-    app.post("/api/admin/product_type_add", (req, res) => {
-        var form = new multiparty.Form();
-
-        checkAccessToken(req.headers, res, (uObj) => {
-
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["type_name", "color"], () => {
-                    helper.CheckParameterValid(res, files, ["image"], () => {
-                        var extension = files.image[0].originalFilename.substring(files.image[0].originalFilename.lastIndexOf(".") + 1);
-
-                        var imageFileName = "type/" + helper.fileNameGenerate(extension);
-                        var newPath = imageSavePath + imageFileName;
-
-                        fs.rename(files.image[0].path, newPath, (err) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return
-                            } else {
-                                db.query("INSERT INTO `type_detail`( `type_name`, `image`, `color`, `created_date`, `modify_date`) VALUES  (?,?,?, NOW(), NOW())", [
-                                    reqObj.type_name[0], imageFileName, reqObj.color[0]
-                                ], (err, result) => {
-
-                                    if (err) {
-                                        helper.ThrowHtmlError(err, res);
-                                        return;
-                                    }
-
-                                    if (result) {
-                                        res.json({
-                                            "status": "1", "payload": {
-                                                "type_id": result.insertId,
-                                                "type_name": reqObj.type_name[0],
-                                                "color": reqObj.color[0],
-                                                "image": helper.ImagePath() + imageFileName,
-                                            }, "message": msg_type_added
-                                        });
-                                    } else {
-                                        res.json({ "status": "0", "message": msg_fail })
-                                    }
-
-                                })
-                            }
-                        })
-                    })
+                    status: false,
+                    message: 'This Contact Already Saved'
                 })
-
-            })
-
-        })
-    })
-
-    app.post("/api/admin/product_type_update", (req, res) => {
-        var form = new multiparty.Form();
-
-        checkAccessToken(req.headers, res, (uObj) => {
-
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["type_id", "type_name", "color"], () => {
-
-                    var condition = "";
-                    var imageFileName = "";
-
-                    if (files.image != undefined || files.image != null) {
-                        var extension = files.image[0].originalFilename.substring(files.image[0].originalFilename.lastIndexOf(".") + 1);
-
-                        imageFileName = "type/" + helper.fileNameGenerate(extension);
-                        var newPath = imageSavePath + imageFileName;
-
-                        condition = " `image` = '" + imageFileName + "', ";
-                        fs.rename(files.image[0].path, newPath, (err) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err);
-                                return
-                            } else {
-
-                            }
+            }
+            else {
+                db.query('INSERT INTO contact_book SET ?', users, function (error, results, fields) {
+                    if (error) {
+                        res.json({
+                            status: false,
+                            message: error
                         })
-                    }
-
-
-                    db.query("UPDATE `type_detail` SET `type_name`=?," + condition + " `color`=?,`modify_date`=NOW() WHERE `type_id`= ? AND `status` = ? ", [
-                        reqObj.type_name[0], reqObj.color[0], reqObj.type_id[0], "1"
-                    ], (err, result) => {
-
-                        if (err) {
-                            helper.ThrowHtmlError(err, res);
-                            return;
-                        }
-
-                        if (result) {
+                    } else {
+                        var id = results.insertId;
+                        db.query('SELECT * FROM contact_book WHERE contact_id = ?', [id], function (error, results, fields) {
                             res.json({
-                                "status": "1", "payload": {
-                                    "type_id": parseInt(reqObj.type_id[0]),
-                                    "type_name": reqObj.type_name[0],
-                                    "color": reqObj.color[0],
-                                    "image": helper.ImagePath() + imageFileName,
-                                }, "message": msg_type_update
-                            });
-                        } else {
-                            res.json({ "status": "0", "message": msg_fail })
-                        }
-
-                    })
-                })
-
-            })
-
-        })
-    })
-
-    app.post('/api/admin/product_type_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["type_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `type_detail` SET `status`= ?, `modify_date` = NOW() WHERE `type_id`= ? ", [
-                    "2", reqObj.type_id,
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_type_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/product_type_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `type_id`, `type_name`,  (CASE WHEN `image` != '' THEN CONCAT('" + helper.ImagePath() + "','',`image`)  ELSE `image` END) AS `image` , `color` FROM `type_detail` WHERE `status`= ? ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
-                res.json({
-                    "status": "1", "payload": result
-                });
-            })
-        }, "2")
-    })
-
-
- 
-
-    // ----------------------------------------------------------------------------------------------------------------------
-    app.post('/api/admin/product_nutrition_add', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "nutrition_name", "nutrition_value"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("INSERT INTO `nutrition_detail`( `prod_id`, `nutrition_name`, `nutrition_value`, `created_date`, `modify_date`) VALUES (?,?,?, NOW(), NOW())", [
-                    reqObj.prod_id, reqObj.nutrition_name, reqObj.nutrition_value
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result) {
-                        res.json({
-                            "status": "1", "message": msg_nutrition_added
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-
-
-
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/product_nutrition_update', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "nutrition_id", "nutrition_name", "nutrition_value"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("UPDATE `nutrition_detail` SET `nutrition_name`= ?,`nutrition_value`= ?, `modify_date`= NOW() WHERE  `prod_id`= ? AND `nutrition_id` = ? AND `status` = ? ", [
-                    reqObj.nutrition_name, reqObj.nutrition_value, reqObj.prod_id, reqObj.nutrition_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_nutrition_update
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/product_nutrition_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "nutrition_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("UPDATE `nutrition_detail` SET `status`= ?, `modify_date`= NOW() WHERE  `prod_id`= ? AND `nutrition_id` = ? AND `status` = ? ", [
-                    "2", reqObj.prod_id, reqObj.nutrition_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_nutrition_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post("/api/admin/product_image_add", (req, res) => {
-        var form = new multiparty.Form();
-
-        checkAccessToken(req.headers, res, (uObj) => {
-
-            form.parse(req, (err, reqObj, files) => {
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return
-                }
-
-                helper.Dlog("---------- Parameter ----")
-                helper.Dlog(reqObj)
-                helper.Dlog("---------- Files ----")
-                helper.Dlog(files)
-
-                helper.CheckParameterValid(res, reqObj, ["prod_id"], () => {
-                    helper.CheckParameterValid(res, files, ["image"], () => {
-                        var extension = files.image[0].originalFilename.substring(files.image[0].originalFilename.lastIndexOf(".") + 1);
-
-                        var imageFileName = "product/" + helper.fileNameGenerate(extension);
-                        var newPath = imageSavePath + imageFileName;
-
-                        fs.rename(files.image[0].path, newPath, (err) => {
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return
-                            } else {
-                                db.query("INSERT INTO `image_detail`( `prod_id`, `image`, `created_date`, `modify_date`) VALUES  (?,?, NOW(), NOW())", [
-                                    reqObj.prod_id[0], imageFileName
-                                ], (err, result) => {
-
-                                    if (err) {
-                                        helper.ThrowHtmlError(err, res);
-                                        return;
-                                    }
-
-                                    if (result) {
-                                        res.json({
-                                            "status": "1", "message": msg_product_image_added
-                                        });
-                                    } else {
-                                        res.json({ "status": "0", "message": msg_fail })
-                                    }
-
-                                })
-                            }
+                                status: true,
+                                data: results,
+                                message: 'Contact  Create  Successfully'
+                            })
                         })
-                    })
+                    }
                 })
-
-            })
-
-        })
-    })
-
-    app.post('/api/admin/product_image_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "img_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `image_detail` SET `status`= ?, `modify_date` = NOW() WHERE `prod_id`= ? AND `img_id` = ? AND `status` = ? ", [
-                    "2", reqObj.prod_id, reqObj.img_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_product_image_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-  
-    app.post('/api/admin/product_category_type_brand_list', (req, res) => {
-        helper.Dlog(req.body);
-        checkAccessToken(req.headers, res, () => {
-
-            db.query("SELECT `brand_id`, `brand_name` FROM `brand_detail` WHERE `status` = ? ;" +
-                "SELECT `cat_id`, `cat_name`, (CASE WHEN `image` != '' THEN CONCAT('" + image_base_url + "', '', `image`) ELSE '' END ) AS `image`, `color` FROM `category_detail` WHERE `status`= ? ;" +
-
-                "SELECT `type_id`, `type_name`, (CASE WHEN `image` != '' THEN CONCAT('" + image_base_url + "', '', `image`) ELSE '' END ) AS `image`, `color` FROM `type_detail` WHERE `status` = ? ", ["1", "1", "1"], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    res.json({
-                        'status': "1",
-                        'payload': {
-                            "brand_list": result[0],
-                            "category_list": result[1],
-                            "type_list": result[2],
-                        }
-                    })
-                }
-
-            )
-
-        }, "2")
-    })
-
-    app.post('/api/admin/product_detail', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-        checkAccessToken(req.headers, res, (uObj) => {
-            helper.CheckParameterValid(res, reqObj, ["prod_id"], () => {
-
-                getProductDetail(res, reqObj.prod_id);
-
-            })
-        }, "2")
-
-    })
-
-    function getProductDetail(res, prod_id) {
-        db.query("SELECT `pd`.`prod_id`, `pd`.`cat_id`, `pd`.`brand_id`, `pd`.`type_id`, `pd`.`name`, `pd`.`detail`, `pd`.`unit_name`, `pd`.`unit_value`, `pd`.`nutrition_weight`, `pd`.`price`, `pd`.`created_date`, `pd`.`modify_date`, `cd`.`cat_name`, IFNULL( `bd`.`brand_name`, '' ) AS `brand_name` , `td`.`type_name` FROM `product_detail` AS  `pd` " +
-            "INNER JOIN `category_detail` AS `cd` ON `pd`.`cat_id` = `cd`.`cat_id` " +
-            "LEFT JOIN `brand_detail` AS `bd` ON `pd`.`brand_id` = `bd`.`brand_id` " +
-            "INNER JOIN `type_detail` AS `td` ON `pd`.`type_id` = `td`.`type_id` " +
-            " WHERE `pd`.`status` = ? AND `pd`.`prod_id` = ? ; " +
-
-            " SELECT `nutrition_id`, `prod_id`, `nutrition_name`, `nutrition_value` FROM `nutrition_detail` WHERE `prod_id` = ? AND `status` = ? ORDER BY `nutrition_name`;" +
-
-
-            "SELECT `img_id`, `prod_id`, (CASE WHEN `image` != '' THEN CONCAT('" + image_base_url + "', '', `image`) ELSE '' END ) AS `image` FROM `image_detail` WHERE `prod_id` = ? AND `status` = ? ;" +
-
-            "SELECT `rd`.`review_id`, `rd`.`prod_id`, `rd`.`user_id`, `rd`.`rate`, `rd`.`message`, `rd`.`created_date`, `ud`.`name` FROM `review_detail` AS `rd`  " +
-            "INNER JOIN `user_detail` AS `ud` ON `ud`.`user_id` = `rd`.`user_id` AND `rd`.`prod_id` = ? ORDER BY `rd`.`review_id` DESC ", [
-
-
-
-            "1", prod_id, prod_id, "1", prod_id, "1", prod_id
-
-        ], (err, result) => {
-
-            if (err) {
-                helper.ThrowHtmlError(err, res);
-                return;
             }
+        })
+    })
 
-            // result = result.replace_null()
+    app.put('/api/update_contact_list', (req, res) => {
+        let contact_id = req.body.contact_id
+        var data = {
+            "user_id": req.body.user_id,
+            "contact_name": req.body.contact_name,
+            "contact_number": req.body.contact_number,
+            "contact_email": req.body.contact_email,
+            "contact_status": req.body.contact_status,
+        }
 
-            // helper.Dlog(result);
-
-            if (result[0].length > 0) {
-
-                result[0][0].nutrition_list = result[1];
-                result[0][0].images = result[2];
-                result[0][0].review_list = result[3];
-
+        db.query('UPDATE contact_book SET ? WHERE contact_id = ?', [data, contact_id], function (error, results, fields) {
+            if (error) {
                 res.json({
-                    "status": "1", "payload": result[0][0]
-                });
+                    status: false,
+                    message: 'there are some error with query'
+                })
             } else {
-                res.json({ "status": "0", "message": "invalid item" })
+                var id = contact_id;
+                db.query('SELECT * FROM contact_book WHERE contact_id = ?', [id], function (error, results, fields) {
+                    res.json({
+                        status: true,
+                        data: results,
+                        message: 'Conatct   Update  Successfully'
+                    })
+                })
             }
 
-
-
         })
-    }
 
-    app.post('/api/admin/zone_add', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["zone_name"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("SELECT `zone_id`, `name` FROM `zone_detail` WHERE `name`  = ? AND `status` = ?", [reqObj.zone_name, "1"], (err, result) => {
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.length > 0) {
-                        //already added this brand
-
-                        res.json({ "status": "1", "payload": result[0], "message": msg_already_added });
-
-                    } else {
-                        db.query("INSERT INTO `zone_detail`( `name`, `created_date`, `modify_date`) VALUES (?, NOW(), NOW())", [
-                            reqObj.zone_name
-                        ], (err, result) => {
-
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return;
-                            }
-
-                            if (result) {
-                                res.json({
-                                    "status": "1", "payload": {
-                                        "zone_id": result.insertId,
-                                        "name": reqObj.zone_name,
-                                    }, "message": msg_zone_added
-                                });
-                            } else {
-                                res.json({ "status": "0", "message": msg_fail })
-                            }
-
-                        })
-
-                    }
-                })
-
-            }, "2")
-        })
     })
 
-    app.post('/api/admin/zone_update', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["zone_id", "zone_name"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-
-                db.query("UPDATE `zone_detail` SET `name`= ?, `modify_date` = NOW() WHERE `zone_id`= ? AND `status` = ? ", [
-                    reqObj.zone_name, reqObj.zone_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_zone_update
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/zone_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["zone_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `zone_detail` SET `status`= ?, `modify_date` = NOW() WHERE `zone_id`= ? ", [
-                    "2", reqObj.zone_id,
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_zone_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/zone_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `zone_id`, `name` FROM `zone_detail` WHERE `status`= ? ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
+    app.delete('/api/delete_contact/:id', (req, res) => {
+        db.query('DELETE FROM contact_book WHERE contact_id=?', [req.params.id], (err, rows, fields) => {
+            if (!err) {
                 res.json({
-                    "status": "1", "payload": result
-                });
-            })
-        }, "2")
+                    status: true,
+                    message: 'Contact deleted Successfully'
+                })
+            } else {
+                console.log(err)
+            }
+        });
     })
 
-    app.post('/api/admin/area_add', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
+    ///////////////////////////////==================================tax===========================/////////////////////////////////////////
 
-        helper.CheckParameterValid(res, reqObj, ["area_name", "zone_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("SELECT `area_id`, `name` FROM `area_detail` WHERE `name`  = ? AND `zone_id` = ? AND `status` = ?", [reqObj.area_name, reqObj.zone_id, "1"], (err, result) => {
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.length > 0) {
-                        //already added this brand
-
-                        res.json({ "status": "1", "payload": result[0], "message": msg_already_added });
-
-                    } else {
-                        db.query("INSERT INTO `area_detail`( `name`, `zone_id` , `created_date`, `modify_date`) VALUES (?,?, NOW(), NOW())", [
-                            reqObj.area_name, reqObj.zone_id
-                        ], (err, result) => {
-
-                            if (err) {
-                                helper.ThrowHtmlError(err, res);
-                                return;
-                            }
-
-                            if (result) {
-                                res.json({
-                                    "status": "1", "message": msg_area_added
-                                });
-                            } else {
-                                res.json({ "status": "0", "message": msg_fail })
-                            }
-                        })
-
-                    }
-                })
-
-            }, "2")
+    app.get('/api/tax_list', (req, res) => {
+        db.query('SELECT * FROM  tax  ORDER BY tax_id DESC ', (err, result) => {
+            if (err) throw err;
+            res.end(JSON.stringify(result));
         })
     })
 
-    app.post('/api/admin/area_update', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
+    app.post('/api/add_tax', (req, res) => {
+        var users = {
+            "user_id": req.body.user_id,
+            "total_tax": req.body.total_tax,
+        }
+        db.query('INSERT INTO tax SET ?', users, function (error, results, fields) {
 
-        helper.CheckParameterValid(res, reqObj, ["area_id", "zone_id", "area_name"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-
-                db.query("UPDATE `area_detail` SET `name`= ?, `zone_id` = ? , `modify_date` = NOW() WHERE `area_id`= ? AND `status` = ? ", [
-                    reqObj.area_name, reqObj.zone_id, reqObj.area_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_area_update
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
+            if (error) {
+                res.json({
+                    status: false,
+                    message: error
                 })
-            }, "2")
+            } else {
+                res.json({
+                    status: true,
+                    data: results,
+                    message: 'tax Saved Successfully'
+                })
+
+            }
         })
     })
 
-    app.post('/api/admin/area_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
+    app.put('/api/update_tax', (req, res) => {
+        let tax_id = req.body.tax_id
+        var data = {
+            "user_id": req.body.user_id,
+            "total_tax": req.body.total_tax,
+        }
 
-        helper.CheckParameterValid(res, reqObj, ["area_id"], () => {
+        db.query('UPDATE tax SET ? WHERE tax_id  = ?', [data, tax_id], function (error, results, fields) {
 
-            checkAccessToken(req.headers, res, (uObj) => {
-                db.query("UPDATE `area_detail` SET `status`= ?, `modify_date` = NOW() WHERE `area_id`= ? ", [
-                    "2", reqObj.area_id,
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_area_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
+            if (error) {
+                res.json({
+                    status: false,
+                    message: 'there are some error with query'
                 })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/area_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            helper.CheckParameterValid(res, reqObj, ["zone_id"], () => {
-
-
-
-                db.query("SELECT `ad`.`area_id`, `ad`.`zone_id` , `ad`.`name`, `zd`.`name` AS `zone_name`  FROM `area_detail` AS `ad` INNER JOIN `zone_detail` AS `zd` ON `zd`.`zone_id` = `ad`.`zone_id` AND `zd`.`status` = '1' AND `zd`.`zone_id` = ? WHERE `ad`.`status`= ? ", [
-                    reqObj.zone_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
+            } else {
+                var id = tax_id;
+                db.query('SELECT * FROM tax WHERE tax_id  = ?', [id], function (error, results, fields) {
                     res.json({
-                        "status": "1", "payload": result
-                    });
+                        status: true,
+                        data: results,
+                        message: 'Tax  Update  Successfully'
+                    })
                 })
-            })
-        }, "2")
-    })
-
-    app.post('/api/admin/offer_add', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["prod_id", "price", "start_date", "end_date"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-                db.query("INSERT INTO `offer_detail`( `prod_id`, `price`, `start_date`, `end_date`,  `created_date`, `modify_date`) VALUES (?,?,?, ?,NOW(), NOW())", [
-                    reqObj.prod_id, reqObj.price, reqObj.start_date, reqObj.end_date
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result) {
-                        res.json({
-                            "status": "1", "message": msg_offer_added
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-                })
-            }, "2")
+            }
         })
     })
 
-    app.post('/api/admin/offer_delete', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        helper.CheckParameterValid(res, reqObj, ["offer_id"], () => {
-
-            checkAccessToken(req.headers, res, (uObj) => {
-
-
-                db.query("UPDATE `offer_detail` SET `status`= ?, `modify_date` = NOW() WHERE `offer_id`= ? AND `status` = ? ", [
-                    "2", reqObj.offer_id, "1"
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return;
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            "status": "1", "message": msg_offer_delete
-                        });
-                    } else {
-                        res.json({ "status": "0", "message": msg_fail })
-                    }
-
-                })
-            }, "2")
-        })
-    })
-
-    app.post('/api/admin/offer_list', (req, res) => {
-        helper.Dlog(req.body);
-        var reqObj = req.body;
-
-        checkAccessToken(req.headers, res, (uObj) => {
-            db.query("SELECT `offer_id`, `prod_id`, `price`, `start_date`, `end_date`, `status`, `created_date`, `modify_date` FROM `offer_detail` WHERE `status`= ? ", [
-                "1"
-            ], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res);
-                    return;
-                }
-
+    app.delete('/api/delete_tax/:id', (req, res) => {
+        db.query('DELETE FROM tax WHERE tax_id=?', [req.params.id], (err) => {
+            if (!err) {
                 res.json({
-                    "status": "1", "payload": result
-                });
-            })
-        }, "2")
+                    status: true,
+                    message: 'Tax Deleted Successfully'
+                })
+            } else {
+            }
+        });
+    });
+
+    ///////////////////////////---=================================khatabook=============================================////////////////
+
+    app.get('/api/khatabook_list', (req, res) => {
+        db.query('SELECT * FROM khatabook', (err, result) => {
+            if (err) throw err;
+            console.log(result)
+            res.end(JSON.stringify(result));
+        })
     })
+    app.post('/api/add_khatabook', (req, res) => {
 
-    app.post('/api/admin/offer_product_list', (req, res) => {
+        console.log(req.body)
+        var users = {
+            "user_id": req.body.user_id,
+            "customer_name": req.body.customer_name,
+            "customer_number": req.body.customer_number,
+            "amount": req.body.amount,
+            "amount_status": req.body.amount_status,
+            "total_amount": req.body.total_amount,
+        }
 
-        checkAccessToken(req.headers, res, (uObj) => {
+        db.query('INSERT INTO  khatabook SET ?', users, function (error, results, fields) {
+            if (error) {
+                res.json({
+                    status: false,
+                    message: error + 'there are some error with query'
+                })
+            } else {
+                var khatanum = results.insertId;
+                console.log(khatanum + 'id')
 
-            db.query('SELECT  `od`.`offer_id`, `od`.`prod_id`, `od`.`price` AS `offer_price`, `od`.`start_date`, `od`.`end_date`, `od`.`status`, `od`.`created_date`, `od`.`modify_date`, `pd`.`cat_id`, `pd`.`brand_id`, `pd`.`type_id`, `pd`.`name`, `pd`.`detail`, `pd`.`price`, `pd`.`unit_name`, `pd`.`unit_value`, `pd`.`nutrition_weight`, IFNULL( `cd`.`cat_name`, "" ) AS `cat_name`, IFNULL( `bd`.`brand_name`, "" ) AS `brand_name`, IFNULL( `td`.`type_name`, "" ) AS `type_name`, (CASE WHEN `imd`.`image` != "" THEN CONCAT( "' + image_base_url + '", "", `imd`.`image` ) ELSE "" END) AS `image` FROM `offer_detail` AS `od` ' +
-
-                'INNER JOIN `product_detail` AS `pd` ON `od`.`prod_id` = `pd`.`prod_id` AND `pd`.`status` =  ?  ' +
-                'LEFT JOIN `category_detail` AS `cd` ON `pd`.`cat_id` = `cd`.`cat_id` AND `cd`.`status` = ? ' +
-                'LEFT JOIN `brand_detail` AS `bd` ON `pd`.`brand_id` = `bd`.`brand_id` AND `bd`.`status` = ? ' +
-                'LEFT JOIN `type_detail` AS `td` ON `pd`.`type_id` = `td`.`type_id` AND `td`.`status` = ? ' +
-                'INNER JOIN `image_detail` AS `imd` ON `imd`.`prod_id` = `imd`.`prod_id` AND `imd`.`status` =  ?  ' +
-                ' WHERE `od`.`status`= ? AND `od`.`end_date` >= NOW() GROUP BY `od`.`offer_id`', ["1", "1", "1", "1", "1", "1"], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res);
-                        return
-                    }
-
+                db.query('SELECT * FROM khatabook WHERE khatanum = ?', [khatanum], function (error, results, fields) {
                     res.json({
-                        "status": "1", "payload": result
-                    });
-
+                        status: true,
+                        data: results,
+                        // fields: fields,
+                        message: 'Khata book information  insert Successfully'
+                    })
                 })
-
+            }
         })
-
-
     })
 
-    app.post('/api/admin/promo_code_add', (req, res) => {
-        helper.Dlog(req.body)
-        var reqObj = req.body
-
-        checkAccessToken(req.headers, res, (userObj) => {
-            helper.CheckParameterValid(res, reqObj, ["code", "title", "description", "type", "min_order_amount", "max_discount_amount", "offer_price", "start_date", "end_date"], () => {
-                db.query("SELECT `promo_code_id` FROM `promo_code_detail` WHERE `code` = ? AND `status` = 1 ", [reqObj.code,], (err, result) => {
-                    if (err) {
-                        helper.ThrowHtmlError(err, res)
-                        return
-                    }
-
-                    if (result.length > 0) {
-                        res.json({
-                            'status': '0',
-                            'message': msg_added
-                        })
-                    } else {
-                        db.query("INSERT INTO `promo_code_detail` ( `code`, `title`, `description`, `type`, `min_order_amount`, `max_discount_amount`, `offer_price`, `start_date`, `end_date`) VALUES (?,?,?, ?,?,?, ?,?,?)", [
-                            reqObj.code, reqObj.title, reqObj.description, reqObj.type, reqObj.min_order_amount, reqObj.max_discount_amount, reqObj.offer_price, reqObj.start_date, reqObj.end_date
-                        ], (err, result) => {
-
-                            if (err) {
-                                helper.ThrowHtmlError(err, res)
-                                return
-                            }
-
-                            if (result) {
-                                res.json({
-                                    'status': '1',
-                                    'message': msg_promo_code_added
-                                })
-                            } else {
-                                res.json({
-                                    'status': '0',
-                                    'message': msg_fail
-                                })
-                            }
-                        })
-                    }
-                })
-            })
-        }, "2")
-    })
-
-    app.post('/api/admin/promo_code_update', (req, res) => {
-        helper.Dlog(req.body)
-        var reqObj = req.body
-
-        checkAccessToken(req.headers, res, (userObj) => {
-            helper.CheckParameterValid(res, reqObj, ["promo_code_id", "title", "description", "type", "min_order_amount", "max_discount_amount", "offer_price", "start_date", "end_date"], () => {
-
-                db.query("UPDATE `promo_code_detail` SET `title`= ? ,`description`= ? ,`type`= ? ,`min_order_amount`= ? ,`max_discount_amount`= ? ,`offer_price`= ? ,`start_date`= ? ,`end_date`= ?, `modify_date` = NOW() WHERE `promo_code_id` = ? AND `start_date` >= NOW() AND `status` = 1 ", [
-                    reqObj.title, reqObj.description, reqObj.type, reqObj.min_order_amount, reqObj.max_discount_amount, reqObj.offer_price, reqObj.start_date, reqObj.end_date, reqObj.promo_code_id
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res)
-                        return
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            'status': '1',
-                            'message': msg_promo_code_update
-                        })
-                    } else {
-                        res.json({
-                            'status': '0',
-                            'message': msg_fail
-                        })
-                    }
-                })
-
-            })
-        }, "2")
-    })
-
-    app.post('/api/admin/promo_code_delete', (req, res) => {
-        helper.Dlog(req.body)
-        var reqObj = req.body
-
-        checkAccessToken(req.headers, res, (userObj) => {
-            helper.CheckParameterValid(res, reqObj, ["promo_code_id"], () => {
-
-                db.query("UPDATE `promo_code_detail` SET `status`= 2 , `modify_date` = NOW() WHERE `promo_code_id` = ? AND `status` = 1 ", [reqObj.promo_code_id
-                ], (err, result) => {
-
-                    if (err) {
-                        helper.ThrowHtmlError(err, res)
-                        return
-                    }
-
-                    if (result.affectedRows > 0) {
-                        res.json({
-                            'status': '1',
-                            'message': msg_promo_code_delete
-                        })
-                    } else {
-                        res.json({
-                            'status': '0',
-                            'message': msg_fail
-                        })
-                    }
-                })
-
-            })
-        }, "2")
-    })
-
-    app.post('/api/admin/promo_code_list', (req, res) => {
-        helper.Dlog(req.body)
-        var reqObj = req.body
-
-        checkAccessToken(req.headers, res, (userObj) => {
-            db.query("SELECT `promo_code_id`, `code`, `title`, `description`, `type`, `min_order_amount`, `max_discount_amount`, `offer_price`, `start_date`, `end_date`, `created_date`, `modify_date` FROM `promo_code_detail` WHERE `status` = 1 ORDER BY `promo_code_id` DESC ", [], (err, result) => {
-
-                if (err) {
-                    helper.ThrowHtmlError(err, res)
-                    return
-                }
-
+    app.post('/api/addamount_khatabook', (req, res) => {
+        var users = {
+            "khatanum": req.body.khatanum,
+            "amount": req.body.amount,
+            "amount_status": req.body.amount_status,
+            "total_amount": req.body.total_amount,
+            "amount_date": new Date(),
+            "description": req.body.description,
+        }
+        db.query('INSERT INTO  khata_hisab SET ?', users, function (error, results, fields) {
+            if (error) {
                 res.json({
-                    'status': '1',
-                    'payload': result,
-                    'message': msg_success
+                    status: false,
+                    message: error + 'there are some error with query'
                 })
-            })
-        }, "2")
+            } else {
+                var khata_id = results.insertId;
+                console.log(khata_id + 'id')
+
+                db.query('SELECT * FROM khata_hisab WHERE khata_id = ?', [khata_id], function (error, results, fields) {
+                    res.json({
+                        status: true,
+                        data: results,
+                        // fields: fields,
+                        message: 'Khata book Amount information  insert Successfully'
+                    })
+                })
+            }
+        })
     })
+
+    app.get('/api/khataamount_list/:khatanum', (req, res) => {
+        db.query('SELECT * FROM khata_hisab WHERE khatanum=?', [req.params.khatanum], (err, results) => {
+            if (!err) {
+                res.send(results);
+            } else {
+                console.log(err)
+            }
+        });
+    })
+
+    app.delete('/api/delete_khatahisab/:id', (req, res) => {
+        db.query('DELETE FROM khata_hisab WHERE khatanum=?', [req.params.id], (err) => {
+            if (!err) {
+                res.json({
+                    status: true,
+                    message: 'Khata Clear Successfully'
+
+                })
+            } else {
+                console.log(err)
+            }
+        });
+    })
+    app.delete('/api/delete_khatahisabCustomer/:id', (req, res) => {
+        db.query('DELETE FROM khatabook WHERE khatanum=?', [req.params.id], (err) => {
+            if (!err) {
+                console.log('deleted')
+                res.json({
+                    status: true,
+                    message: ' Khata deleted Successfully'
+
+                })
+            } else {
+                console.log(err)
+            }
+        });
+    })
+
+
+    //////////////////////////////////////////////===========Counter bill page apis====================//////////////////////////////////
+
+
+   app.get('/api/bill_list', (req, res) => {
+        db.query('SELECT * FROM  book_bill ORDER BY bill_id DESC  ', (err, result) => {
+            if (err) throw err;
+            res.end(JSON.stringify(result));
+        })
+    })
+    
+    app.get('/api/lasttoken', (req, res) => {
+        db.query('SELECT   token_no FROM  book_bill ORDER BY bill_id DESC LIMIT 1  ', (err, result) => {
+            if (err) throw err;
+            res.end(JSON.stringify(result));
+        })
+    })
+    app.get('api/getbill_byTableid/:id', (req, res) => {
+        db.query('SELECT * FROM book_bill WHERE  table_id=?', [req.params.id], (err, results) => {
+            if (err) throw err;
+            res.end(JSON.stringify(results));
+        });
+    })
+    
+    app.get('api/getbill_byBill/:id', (req, res) => {
+        db.query('SELECT * FROM book_bill WHERE  bill_id=?', [req.params.id], (err, results) => {
+            if (err) throw err;
+            res.end(JSON.stringify(results));
+        });
+    })
+    
+    app.get('api/today_bill_list/:id', (req, res) => {
+        db.query('SELECT * FROM  book_bill  and  create_date ='+GETDATE()+' ORDER BY bill_id DESC  ', (err, result) => {
+            if (err) throw err;
+            res.end(JSON.stringify(result));
+        })
+    })
+    app.post('/api/addbill_data', (req, res) => {
+        var responseJson = JSON.stringify(req.body);
+        var users = {
+            "user_id": req.body.user_id,
+            "bill_no": req.body.bill_no,
+            "bill_order": responseJson,
+            "table_id": req.body.table_id,
+            "table_name": req.body.table_name,
+            "total_bill": req.body.total_bill,
+            "bill_status": req.body.bill_status,
+            "cutomer_name": req.body.cutomer_name,
+            "cutomer_number": req.body.cutomer_number,
+            "create_date": req.body.create_date,
+            "cutomer_address":req.body.cutomer_address,
+            "delivery_charge":req.body.delivery_charge,
+            "discount":req.body.discount,
+            "status":req.body.status,
+            "attender_id":req.body.attender_id,
+            "attender_name":req.body.attender_name,
+            "token_no":req.body.token_no,
+            "payment_type":req.body.payment_type,
+            "subtotal_bill":req.body.subtotal_bill,
+            "gst_amt":req.body.gst_amt,
+        }
+        var users1 = {
+            "user_id": req.body.user_id,
+            "contact_name": req.body.cutomer_name,
+            "contact_number": req.body.cutomer_number,
+            "contact_email": '',
+            "contact_status": 1,
+        }
+        
+        db.query('INSERT INTO  book_bill SET ?', users, function (error, results1, fields) {
+            if (error) {
+                res.json({
+                    status: false,
+                    message: error + 'there are some error with query'
+                })
+            } 
+            else {
+                db.query('SELECT * FROM contact_book WHERE contact_number = ?', [ req.body.cutomer_number], function (error12, results2, fields) {
+                    if (results2.length=== 0) {
+                        if(users1.contact_name.length !== 0 && users1.contact_number.length !==0){
+                        db.query('INSERT INTO contact_book SET ?', users1, function (error11, results, fields) { 
+                        })
+                    }
+                    } 
+              })   
+                res.json({
+                    status: true,
+                    data: results1,
+                    message: 'Bill Save  Successfully'
+                })
+            }
+    });
+    })
+    app.put('/api/update_bill_info', (req, res) => {
+        var responseJson = JSON.stringify(req.body);
+        let bill_id = req.body.bill_id
+        var users = {
+            "user_id": req.body.user_id,
+            "bill_no": req.body.bill_no,
+            "bill_order": responseJson,
+            "table_id": req.body.table_id,
+            "table_name": req.body.table_name,
+            "total_bill": req.body.total_bill,
+            "bill_status": req.body.bill_status,
+            "cutomer_name": req.body.cutomer_name,
+            "cutomer_number": req.body.cutomer_number,
+            "create_date": req.body.create_date,
+            "delivery_charge":req.body.delivery_charge,
+            "discount":req.body.discount,
+            "status":req.body.status,
+            "attender_id":req.body.attender_id,
+            "attender_name":req.body.attender_name,
+            "token_no":req.body.token_no,
+            "payment_type":req.body.payment_type,
+            "subtotal_bill":req.body.subtotal_bill,
+            "gst_amt":req.body.gst_amt,
+    
+        }
+    
+        db.query('UPDATE  book_bill SET ? WHERE bill_id = ?', [users, bill_id], function (error, results, fields) {
+    
+            if (error) {
+                res.json({
+                    status: false,
+                    message: 'there are some error with query'
+                })
+            } else {
+    
+                db.query('SELECT * FROM  book_bill WHERE bill_id = ?', [bill_id], function (error, results, fields) {
+                    res.json({
+                        status: true,
+                        data: results,
+                        message: 'Bill  Update  Successfully'
+                    })
+                })
+            }
+        })
+    })
+    
+    app.put('/api/complete_order', (req, res) => {
+        let bill_no = req.body.bill_no
+        var data = {
+            "bill_status": req.body.bill_status,
+            "table_name": req.body.table_name, 
+            "table_id": req.body.table_id,
+        }
+        db.query('UPDATE  book_bill SET ? WHERE bill_no = ?', [data, bill_no], function (error, results, fields) {
+    
+            if (error) {
+                res.json({
+                    status: false,
+                    message: 'there are some error with query'
+                })
+            } else {
+    
+                    res.json({
+                        status: true,
+                        data: results,
+                        message: 'Compete Order  Update  Successfully'
+                    })
+            }
+        })
+    })
+    
+    app.delete('/api/delete_bill/:id', (req, res) => {
+        db.query('DELETE FROM book_bill WHERE bill_id=?', [req.params.id], function (error, results, fields) {
+            if (!error) {
+                res.json({
+                    status: true,
+                    message: 'Bill Deleted Successfully'
+    
+                })
+            } else {
+                console.log(error)
+            }
+        });
+    })
+    
+    //-----------------------------------------------------Dashborad-------------------------------------------------------------------------
+    
+    app.get('/api/getallcount', (req, res) => {
+        var userid=1
+        db.query('SELECT count(*) as total  FROM  book_bill  where user_id = ' + userid + '', (err, result1) => {
+            db.query('SELECT count(*) as total  FROM contact_book	 where user_id = ' + userid + '', (err, result2) => {
+                db.query('SELECT count(*) as total  FROM restro_table  where user_id = ' + userid + '', (err, result3) => {
+                            if (err) throw err;
+                            var results = [];
+                            results.push({
+                                'billCount': result1[0].total,
+                                'customercount': result2[0].total,
+                            });
+                            res.json({
+                                status: true,
+                                data: results,
+                                message: 'Total'
+                            });
+                        });
+              
+            });
+        });
+    });
+
+    // ======================================================================================================================================
+
 
     app.post('/api/admin/new_orders_list', (req, res) => {
         helper.Dlog(req.body)
@@ -1600,43 +956,34 @@ module.exports.controller = (app, io, socket_list) => {
             })
         }, '2')
     })
+///---------------------------------------------------------------------------------------------------------------------------------------------
 
-}
+    function checkAccessToken(headerObj, res, callback, require_type = "") {
+        helper.Dlog(headerObj.access_token);
+        helper.CheckParameterValid(res, headerObj, ["access_token"], () => {
+            db.query("SELECT `user_id`, `username`, `user_type`, `name`, `email`, `mobile`, `mobile_code`,  `auth_token`, `dervice_token`, `status` FROM `user_detail` WHERE `auth_token` = ? AND `status` = ? ", [headerObj.access_token, "1"], (err, result) => {
+                if (err) {
+                    helper.ThrowHtmlError(err, res);
+                    return
+                }
 
-function saveImage(imageFile, savePath) {
-    fs.rename(imageFile.path, savePath, (err) => {
+                helper.Dlog(result);
 
-        if (err) {
-            helper.ThrowHtmlError(err);
-            return;
-        }
-    })
-}
-
-function checkAccessToken(headerObj, res, callback, require_type = "") {
-    helper.Dlog(headerObj.access_token);
-    helper.CheckParameterValid(res, headerObj, ["access_token"], () => {
-        db.query("SELECT `user_id`, `username`, `user_type`, `name`, `email`, `mobile`, `mobile_code`,  `auth_token`, `dervice_token`, `status` FROM `user_detail` WHERE `auth_token` = ? AND `status` = ? ", [headerObj.access_token, "1"], (err, result) => {
-            if (err) {
-                helper.ThrowHtmlError(err, res);
-                return
-            }
-
-            helper.Dlog(result);
-
-            if (result.length > 0) {
-                if (require_type != "") {
-                    if (require_type == result[0].user_type) {
-                        return callback(result[0]);
+                if (result.length > 0) {
+                    if (require_type != "") {
+                        if (require_type == result[0].user_type) {
+                            return callback(result[0]);
+                        } else {
+                            res.json({ "status": "0", "code": "404", "message": "Access denied. Unauthorized user access." })
+                        }
                     } else {
-                        res.json({ "status": "0", "code": "404", "message": "Access denied. Unauthorized user access." })
+                        return callback(result[0]);
                     }
                 } else {
-                    return callback(result[0]);
+                    res.json({ "status": "0", "code": "404", "message": "Access denied. Unauthorized user access." })
                 }
-            } else {
-                res.json({ "status": "0", "code": "404", "message": "Access denied. Unauthorized user access." })
-            }
+            })
         })
-    })
+
+    }
 }

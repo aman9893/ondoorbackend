@@ -3,7 +3,6 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
 const cors = require('cors');
 var fs = require('fs');
 
@@ -14,8 +13,8 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server, {
   cors: {
-   // origin: "http://localhost:4200",
-     origin: "https://ondoorveggi.vercel.app/",
+    // origin: "http://localhost:4200",
+    origin: "https://ondoorveggi.vercel.app/",
     methods: ["GET", "POST"]
   }
 })
@@ -35,12 +34,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/', usersRouterbill)
-const corsOptions = {
-  origin: "http://localhost:4200",
-}
-
-app.use(cors(corsOptions));
 
 const corsOpts = {
   origin: '*',
@@ -83,6 +76,7 @@ fs.readdirSync('./controllers').forEach((file) => {
     route.controller(app, io, user_socket_connect_list);
   }
 })
+
 app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 
@@ -100,7 +94,8 @@ app.use(function(req, res, next) {
    res.header("Access-Control-Allow-Origin", "*");
    res.header("Access-Control-Allow-Headers", "X-Requested-With");
    next();
-});// catch 404 and forward to error handler
+});
+// catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
@@ -115,6 +110,9 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+
 app.get('/test', (req, res) => {
   res.send("hello hotel")
   console.log("Hello hotel")
@@ -132,6 +130,7 @@ Array.prototype.swap = (x, y) => {
   this[y] = b;
   return this;
 }
+
 
 Array.prototype.insert = (index, item) => {
   this.splice(index, 0, item);
