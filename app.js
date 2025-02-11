@@ -36,7 +36,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 const corsOptions = {
-  origin: "http://localhost:4200",
+  origin: "https://ondoorveggi.vercel.app/",
+  // origin: "http://localhost:4200",
 }
 
 app.use(cors(corsOptions));
